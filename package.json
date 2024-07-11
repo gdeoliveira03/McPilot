@@ -1,12 +1,19 @@
 {
-  "name": "mcpilot",
+  "name": "th-mcdonalds",
+  "type": "module",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "bottleneck": "^2.19.5",
+    "dotenv": "^16.4.5",
+    "groq-sdk": "^0.5.0"
+  }
 }
