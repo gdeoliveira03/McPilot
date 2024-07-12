@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const axios = require('axios');
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -61,6 +62,26 @@ class ChatViewProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>AI Chatbot</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 10px;
+                    }
+                    #chatbox {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        height: 300px;
+                        overflow-y: scroll;
+                        margin-bottom: 10px;
+                    }
+                    #userInput {
+                        width: calc(100% - 100px);
+                        padding: 10px;
+                    }
+                    button {
+                        padding: 10px;
+                    }
+                </style>
             </head>
             <body>
                 <h1>Chat with AI</h1>
@@ -71,7 +92,11 @@ class ChatViewProvider {
                     const vscode = acquireVsCodeApi();
                     function sendMessage() {
                         const message = document.getElementById('userInput').value;
+                        if (message.trim() === '') {
+                            return;
+                        }
                         vscode.postMessage({ command: 'sendMessage', text: message });
+                        document.getElementById('userInput').value = '';
                     }
                     window.addEventListener('message', event => {
                         const message = event.data;
@@ -81,6 +106,7 @@ class ChatViewProvider {
                                 const p = document.createElement('p');
                                 p.textContent = message.text;
                                 chatbox.appendChild(p);
+                                chatbox.scrollTop = chatbox.scrollHeight;
                                 break;
                         }
                     });
@@ -91,16 +117,16 @@ class ChatViewProvider {
 
     async handleSendMessage(webviewView, messageText) {
         try {
-            const fetch = (await import('node-fetch')).default;
-            const response = await fetch('YOUR_API_ENDPOINT', {
-                method: 'POST',
+            const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+                message: messageText
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: messageText })
+                    'api-key': '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'
+                }
             });
-            const data = await response.json();
-            webviewView.webview.postMessage({ command: 'receiveMessage', text: data.reply });
+            const reply = response.data.reply;
+            webviewView.webview.postMessage({ command: 'receiveMessage', text: reply });
         } catch (error) {
             console.error('Error sending message:', error);
             webviewView.webview.postMessage({ command: 'receiveMessage', text: 'Error communicating with the server.' });
