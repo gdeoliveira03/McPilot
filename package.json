@@ -1,19 +1,34 @@
 {
-  "name": "th-mcdonalds",
-  "type": "module",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "mcpilot",
+  "displayName": "McPilot",
   "description": "",
-  "dependencies": {
-    "axios": "^1.7.2",
-    "bottleneck": "^2.19.5",
-    "dotenv": "^16.4.5",
-    "groq-sdk": "^0.5.0"
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "mcpilot.mcpilotLives",
+      "title": "WERE HERE"
+    }]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.91.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0"
   }
 }
