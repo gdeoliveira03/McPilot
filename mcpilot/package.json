@@ -13,8 +13,8 @@
   "main": "./extension.js",
   "contributes": {
     "commands": [{
-      "command": "mcpilot.helloWorld",
-      "title": "Hello World"
+      "command": "mcpilot.mcPilot",
+      "title": "McPilot Speaks"
     }]
   },
   "scripts": {
