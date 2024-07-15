@@ -1,143 +1,147 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-const vscode = require('vscode');
-const axios = require('axios');
+const vscode = require("vscode");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const OPENAI_API_KEY = "a2915647c0c04a159c72f15c4f275fe5";
+const OPENAI_ENDPOINT = "https://McPilot.openai.azure.com";
+const DEPLOYMENT_ID = "pilot";
+const API_VERSION = "2023-09-15-preview";
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "mcpilot" is now active!');
-
-	context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('mcpilotChat', new ChatViewProvider(context))
-    );
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('mcpilot.chatbot', () => {
-        vscode.commands.executeCommand('workbench.view.extension.mcpilotSidebar');
-    });
-
-	context.subscriptions.push(disposable);
+async function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class ChatViewProvider {
-    constructor(context) {
-        this.context = context;
-    }
+async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
+  const fetch = (await import('node-fetch')).default;
 
-    resolveWebviewView(webviewView) {
-        webviewView.webview.options = {
-            enableScripts: true
-        };
-
-        webviewView.webview.html = this.getWebviewContent();
-
-        webviewView.webview.onDidReceiveMessage(
-            async message => {
-                switch (message.command) {
-                    case 'sendMessage':
-                        await this.handleSendMessage(webviewView, message.text);
-                        break;
-                }
-            },
-            undefined,
-            this.context.subscriptions
-        );
-    }
-
-    getWebviewContent() {
-        return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>AI Chatbot</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 10px;
-                    }
-                    #chatbox {
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                        height: 300px;
-                        overflow-y: scroll;
-                        margin-bottom: 10px;
-                    }
-                    #userInput {
-                        width: calc(100% - 100px);
-                        padding: 10px;
-                    }
-                    button {
-                        padding: 10px;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Chat with AI</h1>
-                <div id="chatbox"></div>
-                <input id="userInput" type="text" placeholder="Type a message...">
-                <button onclick="sendMessage()">Send</button>
-                <script>
-                    const vscode = acquireVsCodeApi();
-                    function sendMessage() {
-                        const message = document.getElementById('userInput').value;
-                        if (message.trim() === '') {
-                            return;
-                        }
-                        vscode.postMessage({ command: 'sendMessage', text: message });
-                        document.getElementById('userInput').value = '';
-                    }
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        switch (message.command) {
-                            case 'receiveMessage':
-                                const chatbox = document.getElementById('chatbox');
-                                const p = document.createElement('p');
-                                p.textContent = message.text;
-                                chatbox.appendChild(p);
-                                chatbox.scrollTop = chatbox.scrollHeight;
-                                break;
-                        }
-                    });
-                </script>
-            </body>
-            </html>`;
-    }
-
-    async handleSendMessage(webviewView, messageText) {
-        try {
-            const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-                message: messageText
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
-                }
-            });
-            const reply = response.data.reply;
-            webviewView.webview.postMessage({ command: 'receiveMessage', text: reply });
-        } catch (error) {
-            console.error('Error sending message:', error);
-            webviewView.webview.postMessage({ command: 'receiveMessage', text: 'Error communicating with the server.' });
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(
+        `${OPENAI_ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}/completions?api-version=${API_VERSION}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": OPENAI_API_KEY,
+          },
+          body: JSON.stringify({
+            prompt: prompt,
+            temperature: 0.7,
+            top_p: 1,
+            stop: null,
+          }),
         }
+      );
+
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('retry-after');
+        const delayTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
+        await delay(delayTime);
+        backoff *= 2;
+        continue;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].text.trim();
+    } catch (error) {
+      if (i === retries - 1) {
+        console.error("Error fetching Terraform code:", error);
+        throw new Error(`Error fetching Terraform code: ${error.message}`);
+      }
     }
+  }
 }
 
-// This method is called when your extension is deactivated
+function activate(context) {
+  let disposable = vscode.commands.registerCommand(
+    "mcpilot.mcpilotLives",
+    async () => {
+      const panel = vscode.window.createWebviewPanel(
+        "terraformCodeGenerator",
+        "Terraform Code Generator",
+        vscode.ViewColumn.Two,
+        {
+          enableScripts: true
+        }
+      );
+
+      panel.webview.html = getWebviewContent();
+
+      panel.webview.onDidReceiveMessage(
+        async (message) => {
+          if (message.command === "generate") {
+            const prompt = message.text;
+            if (!prompt) {
+              vscode.window.showErrorMessage("No description provided.");
+              return;
+            }
+
+            panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
+
+            try {
+              const terraformCode = await getTerraformCode(prompt);
+              const document = await vscode.workspace.openTextDocument({
+                content: terraformCode,
+                language: "terraform",
+              });
+              await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+            } catch (error) {
+              vscode.window.showErrorMessage(
+                `Failed to generate Terraform configuration: ${error.message}`
+              );
+            }
+          }
+        },
+        undefined,
+        context.subscriptions
+      );
+    }
+  );
+
+  context.subscriptions.push(disposable);
+}
+
+function getWebviewContent() {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Terraform Code Generator</title>
+    </head>
+    <body>
+      <h1>Terraform Code Generator</h1>
+      <textarea id="prompt" rows="10" cols="50" placeholder="Enter the description for the Terraform configuration"></textarea>
+      <br>
+      <button onclick="generateCode()">Generate</button>
+      <div id="progress"></div>
+      <script>
+        const vscode = acquireVsCodeApi();
+        function generateCode() {
+          const prompt = document.getElementById('prompt').value;
+          vscode.postMessage({ command: 'generate', text: prompt });
+        }
+
+        window.addEventListener('message', event => {
+          const message = event.data;
+          switch (message.command) {
+            case 'progress':
+              document.getElementById('progress').innerText = message.text;
+              break;
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `;
+}
+
 function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
-}
+  activate,
+  deactivate,
+};
