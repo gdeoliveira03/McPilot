@@ -1,6 +1,10 @@
+require('dotenv').config({
+  path: `${__dirname}/.env`
+})
+
 const vscode = require("vscode");
 
-const OPENAI_API_KEY = "a2915647c0c04a159c72f15c4f275fe5";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ENDPOINT = "https://McPilot.openai.azure.com";
 const DEPLOYMENT_ID = "pilot";
 const API_VERSION = "2023-09-15-preview";
@@ -27,6 +31,7 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
             temperature: 0.7,
             top_p: 1,
             stop: null,
+            max_tokens: 10000,
           }),
         }
       );
