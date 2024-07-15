@@ -24,6 +24,7 @@ function activate(context) {
 		vscode.window.showInformationMessage('Were alive!');
 	});
 
+
 	context.subscriptions.push(disposable);
 }
 
