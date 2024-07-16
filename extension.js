@@ -5,7 +5,7 @@ require('dotenv').config({
 const vscode = require("vscode");
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_ENDPOINT = "https://McPilot.openai.azure.com";
+const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT;
 const DEPLOYMENT_ID = "pilot";
 const API_VERSION = "2023-09-15-preview";
 
