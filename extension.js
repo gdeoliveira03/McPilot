@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: `${__dirname}/.env`
+})
+
 const vscode = require("vscode");
 
 const OPENAI_API_KEY = "a2915647c0c04a159c72f15c4f275fe5";
@@ -27,6 +31,7 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
             temperature: 0.7,
             top_p: 1,
             stop: null,
+            max_tokens: 10000,
           }),
         }
       );
@@ -60,8 +65,8 @@ function activate(context) {
     async () => {
       const panel = vscode.window.createWebviewPanel(
         "terraformCodeGenerator",
-        "Terraform Code Generator",
-        vscode.ViewColumn.Two,
+        "McPilot",
+        vscode.ViewColumn.Two,  
         {
           enableScripts: true
         }
@@ -78,7 +83,7 @@ function activate(context) {
               return;
             }
 
-            panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
+            panel.webview.postMessage({ command: "progress", text: "Generating Terraform template..." });
 
             try {
               const terraformCode = await getTerraformCode(prompt);
@@ -86,10 +91,10 @@ function activate(context) {
                 content: terraformCode,
                 language: "terraform",
               });
-              await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+              await vscode.window.showTextDocument(document, vscode.ViewColumn.One);  
             } catch (error) {
               vscode.window.showErrorMessage(
-                `Failed to generate Terraform configuration: ${error.message}`
+                `Failed to generate Terraform template: ${error.message}`
               );
             }
           }
@@ -110,12 +115,40 @@ function getWebviewContent() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Terraform Code Generator</title>
+      <title>McPilot</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 10px;
+          margin: 20px;
+        }
+        textarea {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: purple;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: darkmagenta;
+        }
+        #progress {
+          margin-top: 10px;
+          color: #333;
+        }
+      </style>
     </head>
     <body>
-      <h1>Terraform Code Generator</h1>
-      <textarea id="prompt" rows="10" cols="50" placeholder="Enter the description for the Terraform configuration"></textarea>
-      <br>
+      <h1>McPilot</h1>
+      <h3>What can I do for you today?</h3>
+      <textarea id="prompt" rows="10" placeholder="Describe the terraform template you want to generate"></textarea>
       <button onclick="generateCode()">Generate</button>
       <div id="progress"></div>
       <script>
