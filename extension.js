@@ -1,20 +1,25 @@
-require('dotenv').config({
-  path: `${__dirname}/.env`
-})
+require("dotenv").config({
+  path: `${__dirname}/.env`,
+});
 
 const vscode = require("vscode");
-
+const axios = require("axios");
+const aws = require("aws-sdk");
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT;
 const DEPLOYMENT_ID = "pilot";
 const API_VERSION = "2023-09-15-preview";
 
+// This is the endpoint url to the DevBot Lamda Function
+const LAMDA_FUNCTION_ENDPOINT =
+  "https://ka09n6y39a.execute-api.us-east-1.amazonaws.com/dev/generate-terraform";
+
 async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
-  const fetch = (await import('node-fetch')).default;
+  const fetch = (await import("node-fetch")).default;
 
   for (let i = 0; i < retries; i++) {
     try {
@@ -37,7 +42,7 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
       );
 
       if (response.status === 429) {
-        const retryAfter = response.headers.get('retry-after');
+        const retryAfter = response.headers.get("retry-after");
         const delayTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
         await delay(delayTime);
         backoff *= 2;
@@ -49,13 +54,46 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
       }
 
       const data = await response.json();
-      return data.choices[0].text.trim();
+      const terraformCode = data.choices[0].text.trim();
+      await sendToLamda(terraformCode);
+      return terraformCode;
     } catch (error) {
       if (i === retries - 1) {
         console.error("Error fetching Terraform code:", error);
         throw new Error(`Error fetching Terraform code: ${error.message}`);
       }
     }
+  }
+}
+
+// Lamda functions only take key-value values in a json format
+// TO-DO: NEED TO FIGURE OUT HOW TO PARSE THE FILE SO THAT THE LAMDA FUNCTION CAN TAKE IT AS INPUT
+async function sendToLambda(terraformCode) {
+  try {
+    const lambdaResponse = await axios.post(
+      LAMBDA_FUNCTION_URL,
+      { terraformCode },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Lambda response:", lambdaResponse.data);
+    vscode.window.showInformationMessage(
+      "Terraform code sent to Lambda successfully!"
+    );
+  } catch (error) {
+    console.error(
+      "Error sending to Lambda:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error(
+      `Error sending to Lambda: ${
+        error.response ? error.response.data : error.message
+      }`
+    );
   }
 }
 
@@ -68,7 +106,7 @@ function activate(context) {
         "Terraform Code Generator",
         vscode.ViewColumn.Two,
         {
-          enableScripts: true
+          enableScripts: true,
         }
       );
 
@@ -83,7 +121,10 @@ function activate(context) {
               return;
             }
 
-            panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
+            panel.webview.postMessage({
+              command: "progress",
+              text: "Generating Terraform configuration...",
+            });
 
             try {
               const terraformCode = await getTerraformCode(prompt);
@@ -91,7 +132,10 @@ function activate(context) {
                 content: terraformCode,
                 language: "terraform",
               });
-              await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+              await vscode.window.showTextDocument(
+                document,
+                vscode.ViewColumn.One
+              );
             } catch (error) {
               vscode.window.showErrorMessage(
                 `Failed to generate Terraform configuration: ${error.message}`
