@@ -1,7 +1,7 @@
 const vscode = require("vscode");
-const { preprocessPrompt } = require("../utils/prompts");
-const { getTerraformCode } = require("../utils/api");
-const { getWebviewContent } = require("../views/webviewContent");
+const { preprocessPrompt } = require("../utils/prompt.js");
+const { getTerraformCode } = require("../utils/api.js");
+const { getWebviewContent } = require("../views/webviewContent.js");
 
 async function generateTerraform(context) {
   const panel = vscode.window.createWebviewPanel(
