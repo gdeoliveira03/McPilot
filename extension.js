@@ -92,6 +92,8 @@ function activate(context) {
                 language: "terraform",
               });
               await vscode.window.showTextDocument(document, vscode.ViewColumn.One);  
+              panel.webview.postMessage({ command: "progress", text: "" });
+
             } catch (error) {
               vscode.window.showErrorMessage(
                 `Failed to generate Terraform template: ${error.message}`
