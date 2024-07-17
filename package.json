@@ -13,27 +13,10 @@
   "contributes": {
     "commands": [
       {
-        "command": "mcpilot.chatbot",
-        "title": "Open McPilot"
+        "command": "mcpilot.mcpilotLives",
+        "title": "Generate"
       }
-    ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "mcpilotSidebar",
-          "title": "McPilot",
-          "icon": "resources/icon.png"
-        }
-      ]
-    },
-    "views": {
-      "mcpilotSidebar": [
-        {
-          "id": "mcpilotChat",
-          "name": "AI Chatbot"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
@@ -50,9 +33,10 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@azure/identity": "^4.3.0",
     "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
     "node-fetch": "^3.3.2",
-    "dotenv": "^16.0.3",
-    "groq-sdk": "^1.0.0"
+    "openai": "^4.52.7"
   }
 }

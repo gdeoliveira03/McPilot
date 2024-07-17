@@ -1,132 +1,174 @@
-const vscode = require('vscode');
-const axios = require('axios');
+require('dotenv').config({
+  path: `${__dirname}/.env`
+})
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-    console.log('Congratulations, your extension "mcpilot" is now active!');
+const vscode = require("vscode");
 
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('mcpilotChat', new ChatViewProvider(context))
-    );
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT;
+const DEPLOYMENT_ID = "pilot";
+const API_VERSION = "2023-09-15-preview";
 
-    const disposable = vscode.commands.registerCommand('mcpilot.chatbot', () => {
-        vscode.commands.executeCommand('workbencfh.view.extension.mcpilotSidebar');
-    });
-
-    context.subscriptions.push(disposable);
+async function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class ChatViewProvider {
-    constructor(context) {
-        this.context = context;
-    }
+async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
+  const fetch = (await import('node-fetch')).default;
 
-    resolveWebviewView(webviewView) {
-        webviewView.webview.options = {
-            enableScripts: true
-        };
-
-        webviewView.webview.html = this.getWebviewContent();
-
-        webviewView.webview.onDidReceiveMessage(
-            async message => {
-                switch (message.command) {
-                    case 'sendMessage':
-                        await this.handleSendMessage(webviewView, message.text);
-                        break;
-                }
-            },
-            undefined,
-            this.context.subscriptions
-        );
-    }
-
-    getWebviewContent() {
-        return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>AI Chatbot</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 10px;
-                    }
-                    #chatbox {
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                        height: 300px;
-                        overflow-y: scroll;
-                        margin-bottom: 10px;
-                    }
-                    #userInput {
-                        width: calc(100% - 100px);
-                        padding: 10px;
-                    }
-                    button {
-                        padding: 10px;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Chat with AI</h1>
-                <div id="chatbox"></div>
-                <input id="userInput" type="text" placeholder="Type a message...">
-                <button onclick="sendMessage()">Send</button>
-                <script>
-                    const vscode = acquireVsCodeApi();
-                    function sendMessage() {
-                        const message = document.getElementById('userInput').value;
-                        if (message.trim() === '') {
-                            return;
-                        }
-                        vscode.postMessage({ command: 'sendMessage', text: message });
-                        document.getElementById('userInput').value = '';
-                    }
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        switch (message.command) {
-                            case 'receiveMessage':
-                                const chatbox = document.getElementById('chatbox');
-                                const p = document.createElement('p');
-                                p.textContent = message.text;
-                                chatbox.appendChild(p);
-                                chatbox.scrollTop = chatbox.scrollHeight;
-                                break;
-                        }
-                    });
-                </script>
-            </body>
-            </html>`;
-    }
-
-    async handleSendMessage(webviewView, messageText) {
-        try {
-            const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-                message: messageText
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
-                }
-            });
-            const reply = response.data.reply;
-            webviewView.webview.postMessage({ command: 'receiveMessage', text: reply });
-        } catch (error) {
-            console.error('Error sending message:', error);
-            webviewView.webview.postMessage({ command: 'receiveMessage', text: 'Error communicating with the server.' });
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(
+        `${OPENAI_ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}/completions?api-version=${API_VERSION}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": OPENAI_API_KEY,
+          },
+          body: JSON.stringify({
+            prompt: prompt,
+            temperature: 0.7,
+            top_p: 1,
+            stop: null,
+            max_tokens: 10000,
+          }),
         }
-        
+      );
+
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('retry-after');
+        const delayTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
+        await delay(delayTime);
+        backoff *= 2;
+        continue;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].text.trim();
+    } catch (error) {
+      if (i === retries - 1) {
+        console.error("Error fetching Terraform code:", error);
+        throw new Error(`Error fetching Terraform code: ${error.message}`);
+      }
     }
+  }
+}
+
+function preprocessPrompt(rawPrompt) {
+  // Template for generating Terraform code with instructions for the AI
+  const template = `
+    You are an expert in generating Terraform templates. The user will provide a description of what the Terraform template should do. Please generate a \`.tf\` file based on the user's description with the following requirements:
+
+    1. The output must be valid Terraform code.
+    2. Only include code in the output. Any explanations or non-code content should be commented out with a \`#\`.
+    3. Ensure that all necessary resources, configurations, and permissions are included.
+    4. Use AWS as the cloud provider.
+    5. Provide comments and explanations within the code using the \`#\` symbol.
+
+    Here is the user's description:
+    "${rawPrompt}"
+
+    Generate the Terraform template below:
+  `;
+
+  return template.trim();
+}
+
+function activate(context) {
+  let disposable = vscode.commands.registerCommand(
+    "mcpilot.mcpilotLives",
+    async () => {
+      const panel = vscode.window.createWebviewPanel(
+        "terraformCodeGenerator",
+        "Terraform Code Generator",
+        vscode.ViewColumn.Two,
+        {
+          enableScripts: true
+        }
+      );
+
+      panel.webview.html = getWebviewContent();
+
+      panel.webview.onDidReceiveMessage(
+        async (message) => {
+          if (message.command === "generate") {
+            const prompt = message.text;
+            if (!prompt) {
+              vscode.window.showErrorMessage("No description provided.");
+              return;
+            }
+
+            const refinedPrompt = preprocessPrompt(prompt);
+
+            panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
+
+            try {
+              const terraformCode = await getTerraformCode(refinedPrompt);
+              const document = await vscode.workspace.openTextDocument({
+                content: terraformCode,
+                language: "terraform",
+              });
+              await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+            } catch (error) {
+              vscode.window.showErrorMessage(
+                `Failed to generate Terraform configuration: ${error.message}`
+              );
+            }
+          }
+        },
+        undefined,
+        context.subscriptions
+      );
+    }
+  );
+
+  context.subscriptions.push(disposable);
+}
+
+function getWebviewContent() {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Terraform Code Generator</title>
+    </head>
+    <body>
+      <h1>Terraform Code Generator</h1>
+      <textarea id="prompt" rows="10" cols="50" placeholder="Enter the description for the Terraform configuration"></textarea>
+      <br>
+      <button onclick="generateCode()">Generate</button>
+      <div id="progress"></div>
+      <script>
+        const vscode = acquireVsCodeApi();
+        function generateCode() {
+          const prompt = document.getElementById('prompt').value;
+          vscode.postMessage({ command: 'generate', text: prompt });
+        }
+
+        window.addEventListener('message', event => {
+          const message = event.data;
+          switch (message.command) {
+            case 'progress':
+              document.getElementById('progress').innerText = message.text;
+              break;
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `;
 }
 
 function deactivate() {}
 
 module.exports = {
-    activate,
-    deactivate
+  activate,
+  deactivate,
 };
