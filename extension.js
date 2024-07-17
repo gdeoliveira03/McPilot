@@ -1,6 +1,6 @@
 require('dotenv').config({
   path: `${__dirname}/.env`
-})
+});
 
 const vscode = require("vscode");
 
@@ -59,6 +59,55 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
   }
 }
 
+function getWebviewContent() {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Terraform Code Generator</title>
+    </head>
+    <body>
+      <h1>Terraform Code Generator</h1>
+      <textarea id="prompt" rows="10" cols="50" placeholder="Enter the description for the Terraform configuration"></textarea>
+      <br>
+      <label>AWS Access Key: <input type="password" id="awsAccessKey"></label><br>
+      <label>AWS Secret Key: <input type="password" id="awsSecretKey"></label><br>
+      <label>AWS Region: <input type="text" id="awsRegion"></label><br>
+      <button onclick="generateCode()">Generate</button>
+      <div id="progress"></div>
+      <script>
+        const vscode = acquireVsCodeApi();
+        function generateCode() {
+          const prompt = document.getElementById('prompt').value;
+          const awsAccessKey = document.getElementById('awsAccessKey').value;
+          const awsSecretKey = document.getElementById('awsSecretKey').value;
+          const awsRegion = document.getElementById('awsRegion').value;
+
+          vscode.postMessage({
+            command: 'generate',
+            text: prompt,
+            awsAccessKey: awsAccessKey,
+            awsSecretKey: awsSecretKey,
+            awsRegion: awsRegion
+          });
+        }
+
+        window.addEventListener('message', event => {
+          const message = event.data;
+          switch (message.command) {
+            case 'progress':
+              document.getElementById('progress').innerText = message.text;
+              break;
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `;
+}
+
 function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "mcpilot.mcpilotLives",
@@ -78,6 +127,10 @@ function activate(context) {
         async (message) => {
           if (message.command === "generate") {
             const prompt = message.text;
+            const awsAccessKey = message.awsAccessKey;
+            const awsSecretKey = message.awsSecretKey;
+            const awsRegion = message.awsRegion;
+
             if (!prompt) {
               vscode.window.showErrorMessage("No description provided.");
               return;
@@ -86,9 +139,20 @@ function activate(context) {
             panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
 
             try {
-              const terraformCode = await getTerraformCode(prompt);
+              const fullPrompt = `${prompt}
+              AWS Access Key: ${awsAccessKey}
+              AWS Secret Key: ${awsSecretKey}
+              AWS Region: ${awsRegion}`;
+
+              const terraformCode = await getTerraformCode(fullPrompt);
+
+              const finalTerraformCode = terraformCode
+                .replace(/\$\{aws_access_key\}/g, awsAccessKey)
+                .replace(/\$\{aws_secret_key\}/g, awsSecretKey)
+                .replace(/\$\{aws_region\}/g, awsRegion);
+
               const document = await vscode.workspace.openTextDocument({
-                content: terraformCode,
+                content: finalTerraformCode,
                 language: "terraform",
               });
               await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
@@ -106,42 +170,6 @@ function activate(context) {
   );
 
   context.subscriptions.push(disposable);
-}
-
-function getWebviewContent() {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Terraform Code Generator</title>
-    </head>
-    <body>
-      <h1>Terraform Code Generator</h1>
-      <textarea id="prompt" rows="10" cols="50" placeholder="Enter the description for the Terraform configuration"></textarea>
-      <br>
-      <button onclick="generateCode()">Generate</button>
-      <div id="progress"></div>
-      <script>
-        const vscode = acquireVsCodeApi();
-        function generateCode() {
-          const prompt = document.getElementById('prompt').value;
-          vscode.postMessage({ command: 'generate', text: prompt });
-        }
-
-        window.addEventListener('message', event => {
-          const message = event.data;
-          switch (message.command) {
-            case 'progress':
-              document.getElementById('progress').innerText = message.text;
-              break;
-          }
-        });
-      </script>
-    </body>
-    </html>
-  `;
 }
 
 function deactivate() {}
