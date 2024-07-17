@@ -9,9 +9,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:mcpilot.mcpilotLives"
-  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
