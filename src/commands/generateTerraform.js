@@ -22,9 +22,10 @@ async function generateTerraform(context) {
         const awsAccessKey = message.awsAccessKey;
         const awsSecretKey = message.awsSecretKey;
         const awsRegion = message.awsRegion;
+        const filename = message.filename;
 
-        if (!prompt) {
-          vscode.window.showErrorMessage("No description provided.");
+        if (!prompt || !filename) {
+          vscode.window.showErrorMessage("Description and filename are required.");
           return;
         }
 
@@ -44,11 +45,20 @@ async function generateTerraform(context) {
             .replace(/\$\{aws_access_key\}/g, awsAccessKey)
             .replace(/\$\{aws_secret_key\}/g, awsSecretKey)
             .replace(/\$\{aws_region\}/g, awsRegion);
+          
+          const workspaceFolders = vscode.workspace.workspaceFolders;
+          if (!workspaceFolders) {
+            vscode.window.showErrorMessage("No workspace folder open.");
+            return;
+          }
 
-          const document = await vscode.workspace.openTextDocument({
-            content: finalTerraformCode,
-            language: "terraform",
-          });
+          const workspaceFolder = workspaceFolders[0].uri.fsPath;
+          const filePath = `${workspaceFolder}/${filename}`;
+
+          const fileUri = vscode.Uri.file(filePath);
+          await vscode.workspace.fs.writeFile(fileUri, Buffer.from(finalTerraformCode, 'utf8'));
+
+          const document = await vscode.workspace.openTextDocument(fileUri);
           await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
           panel.webview.postMessage({ command: "progress", text: "" });
         } catch (error) {
