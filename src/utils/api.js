@@ -1,19 +1,22 @@
 require('dotenv').config({
-    path: `${__dirname}/../.env`
-  });
-  
-const fetch = require('node-fetch').default;
+    path: `${__dirname}/../../.env`
+});
   
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT;
 const DEPLOYMENT_ID = "pilot";
 const API_VERSION = "2023-09-15-preview";
-  
+
+console.log("API_KEY: ", OPENAI_API_KEY);
+console.log("ENDPOINT: ", OPENAI_ENDPOINT);
+
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
   
 async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
+    const fetch = (await import('node-fetch')).default;
+
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(
