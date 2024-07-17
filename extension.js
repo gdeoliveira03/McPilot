@@ -1,6 +1,6 @@
 require('dotenv').config({
   path: `${__dirname}/.env`
-})
+});
 
 const vscode = require("vscode");
 
@@ -98,6 +98,10 @@ function activate(context) {
         async (message) => {
           if (message.command === "generate") {
             const prompt = message.text;
+            const awsAccessKey = message.awsAccessKey;
+            const awsSecretKey = message.awsSecretKey;
+            const awsRegion = message.awsRegion;
+
             if (!prompt) {
               vscode.window.showErrorMessage("No description provided.");
               return;
@@ -109,8 +113,20 @@ function activate(context) {
 
             try {
               const terraformCode = await getTerraformCode(refinedPrompt);
+              const fullPrompt = `${refinedPrompt}
+              AWS Access Key: ${awsAccessKey}
+              AWS Secret Key: ${awsSecretKey}
+              AWS Region: ${awsRegion}`;
+
+              const terraformCode = await getTerraformCode(fullPrompt);
+
+              const finalTerraformCode = terraformCode
+                .replace(/\$\{aws_access_key\}/g, awsAccessKey)
+                .replace(/\$\{aws_secret_key\}/g, awsSecretKey)
+                .replace(/\$\{aws_region\}/g, awsRegion);
+
               const document = await vscode.workspace.openTextDocument({
-                content: terraformCode,
+                content: finalTerraformCode,
                 language: "terraform",
               });
               await vscode.window.showTextDocument(document, vscode.ViewColumn.One);  
@@ -173,13 +189,27 @@ function getWebviewContent() {
       <h1>McPilot</h1>
       <h3>What can I do for you today?</h3>
       <textarea id="prompt" rows="10" placeholder="Describe the terraform template you want to generate"></textarea>
+      <br>
+      <label>AWS Access Key: <input type="password" id="awsAccessKey"></label><br>
+      <label>AWS Secret Key: <input type="password" id="awsSecretKey"></label><br>
+      <label>AWS Region: <input type="text" id="awsRegion"></label><br>
       <button onclick="generateCode()">Generate</button>
       <div id="progress"></div>
       <script>
         const vscode = acquireVsCodeApi();
         function generateCode() {
           const prompt = document.getElementById('prompt').value;
-          vscode.postMessage({ command: 'generate', text: prompt });
+          const awsAccessKey = document.getElementById('awsAccessKey').value;
+          const awsSecretKey = document.getElementById('awsSecretKey').value;
+          const awsRegion = document.getElementById('awsRegion').value;
+
+          vscode.postMessage({
+            command: 'generate',
+            text: prompt,
+            awsAccessKey: awsAccessKey,
+            awsSecretKey: awsSecretKey,
+            awsRegion: awsRegion
+          });
         }
 
         window.addEventListener('message', event => {
