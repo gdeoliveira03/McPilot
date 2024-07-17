@@ -161,7 +161,6 @@ function activate(context) {
             panel.webview.postMessage({ command: "progress", text: "Generating Terraform configuration..." });
 
             try {
-              const terraformCode = await getTerraformCode(refinedPrompt);
               const fullPrompt = `${refinedPrompt}
               AWS Access Key: ${awsAccessKey}
               AWS Secret Key: ${awsSecretKey}
