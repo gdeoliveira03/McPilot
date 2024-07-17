@@ -1,33 +1,21 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const axios = require('axios');
-
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+    console.log('Congratulations, your extension "mcpilot" is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "mcpilot" is now active!');
-
-	context.subscriptions.push(
+    context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('mcpilotChat', new ChatViewProvider(context))
     );
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('mcpilot.chatbot', () => {
-        vscode.commands.executeCommand('workbench.view.extension.mcpilotSidebar');
+    const disposable = vscode.commands.registerCommand('mcpilot.chatbot', () => {
+        vscode.commands.executeCommand('workbencfh.view.extension.mcpilotSidebar');
     });
 
-
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);
 }
 
 class ChatViewProvider {
@@ -132,13 +120,13 @@ class ChatViewProvider {
             console.error('Error sending message:', error);
             webviewView.webview.postMessage({ command: 'receiveMessage', text: 'Error communicating with the server.' });
         }
+        
     }
 }
 
-// This method is called when your extension is deactivated
 function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
-}
+    activate,
+    deactivate
+};
