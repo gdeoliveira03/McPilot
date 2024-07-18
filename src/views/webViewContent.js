@@ -25,6 +25,7 @@ function getWebviewContent() {
           padding: 10px 20px;
           border: none;
           cursor: pointer;
+          border-radius: 10px; 
         }
         button:hover {
           background-color: darkmagenta;
@@ -35,6 +36,9 @@ function getWebviewContent() {
         }
         .hidden {
           display: none;
+        }
+        h1,awsCredentials {
+          color: white; 
         }
       </style>
     </head>
