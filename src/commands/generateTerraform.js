@@ -13,7 +13,7 @@ async function generateTerraform(context) {
     }
   );
 
-  panel.webview.html = getWebviewContent();
+  panel.webview.html = getWebviewContent(panel);
 
   panel.webview.onDidReceiveMessage(
     async (message) => {
