@@ -11,13 +11,27 @@ function getWebviewContent() {
           font-family: Arial, sans-serif;
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
+          align-items: center;
           padding: 10px;
           margin: 20px;
         }
-        textarea, .terraform-prompt {
+        .centered-container {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
           width: 100%;
-          margin-bottom: 10px;
+          max-width: 300px;
+          margin-top: 20px;
+        }
+        textarea {
+          width: 100%;
+          margin-bottom: 20px;
+          margin-top: 20px;
+        }
+        .button-container {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
         }
         button {
           background-color: purple;
@@ -36,22 +50,62 @@ function getWebviewContent() {
         .hidden {
           display: none;
         }
+        .input-group {
+          margin-bottom: 10px;
+          width: 100%;
+        }
+        label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+        .centered-button {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          margin: 15px;
+        }
+        .centered {
+          text-align: center;
+          width: 100%;
+          margin-top: -10px;
+        }
+        #progress {
+          margin-top: 20px;
+          color: grey;
+        }
       </style>
     </head>
     <body>
       <h1>McPilot</h1>
-      <div id="awsCredentials">
-        <label>Filename: <input type="text" id="filename" placeholder="template.tf"></label><br>
-        <label>AWS Access Key: <input type="password" id="awsAccessKey"></label><br>
-        <label>AWS Secret Key: <input type="password" id="awsSecretKey"></label><br>
-        <label>AWS Region: <input type="text" id="awsRegion"></label><br>
-        <button onclick="enterCredentials()">Enter</button>
+      <div id="awsCredentialsTitle" class="centered">
+        <h3>Please enter the filename and your AWS account credentials</h3>
       </div>
-      <div id="terraformPrompt" class="hidden">
-        <h3>What can I do for you today?</h3>
+      <div id="awsCredentials" class="centered-container">
+        <div class="input-group">
+          <label>Filename: <input type="text" id="filename" placeholder="template.tf"></label><br>
+        </div>
+        <div class="input-group">
+          <label>AWS Access Key: <input type="password" id="awsAccessKey"></label>
+        </div>
+        <div class="input-group">
+          <label>AWS Secret Key: <input type="password" id="awsSecretKey"></label>
+        </div>
+        <div class="input-group">
+          <label>AWS Region: <input type="text" id="awsRegion"></label>
+        </div>
+        <div class="centered-button">
+          <button onclick="enterCredentials()">Continue</button>
+        </div>
+      </div>
+      <div id="terraformPrompt" class="hidden centered-container">
+        <h3 class="centered">What can I do for you today?</h3>
         <textarea id="prompt" rows="10" placeholder="Describe the terraform template you want to generate"></textarea>
-         <button onclick="goBack()">Back</button>
-        <button onclick="generateCode()">Generate</button>
+        <div class="button-container">
+          <button onclick="goBack()">Back</button>
+          <button onclick="generateCode()">Generate</button>
+        </div>
       </div>
       <div id="progress"></div>
       <script>
@@ -70,11 +124,13 @@ function getWebviewContent() {
 
           document.getElementById('awsCredentials').classList.add('hidden');
           document.getElementById('terraformPrompt').classList.remove('hidden');
+          document.getElementById('awsCredentialsTitle').classList.add('hidden');
         }
 
         function goBack() {
           document.getElementById('terraformPrompt').classList.add('hidden');
           document.getElementById('awsCredentials').classList.remove('hidden');
+          document.getElementById('awsCredentialsTitle').classList.remove('hidden');
         }
 
         function generateCode() {
@@ -107,7 +163,7 @@ function getWebviewContent() {
     </html>
   `;
 }
-  
-  module.exports = {
-    getWebviewContent,
-  };
+
+module.exports = {
+  getWebviewContent,
+};
