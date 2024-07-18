@@ -80,9 +80,12 @@ function getWebviewContent() {
     <body>
       <h1>McPilot</h1>
       <div id="awsCredentialsTitle" class="centered">
-        <h3>Please enter your AWS account credentials</h3>
+        <h3>Please enter the filename and your AWS account credentials</h3>
       </div>
       <div id="awsCredentials" class="centered-container">
+        <div class="input-group">
+          <label>Filename: <input type="text" id="filename" placeholder="template.tf"></label><br>
+        </div>
         <div class="input-group">
           <label>AWS Access Key: <input type="password" id="awsAccessKey"></label>
         </div>
@@ -112,8 +115,9 @@ function getWebviewContent() {
           const awsAccessKey = document.getElementById('awsAccessKey').value;
           const awsSecretKey = document.getElementById('awsSecretKey').value;
           const awsRegion = document.getElementById('awsRegion').value;
+          const filename = document.getElementById('filename').value;
 
-          if (!awsAccessKey || !awsSecretKey || !awsRegion) {
+          if (!awsAccessKey || !awsSecretKey || !awsRegion || !filename) {
             alert('Please fill in all AWS credentials');
             return;
           }
@@ -134,13 +138,15 @@ function getWebviewContent() {
           const awsAccessKey = document.getElementById('awsAccessKey').value;
           const awsSecretKey = document.getElementById('awsSecretKey').value;
           const awsRegion = document.getElementById('awsRegion').value;
+          const filename = document.getElementById('filename').value;
 
           vscode.postMessage({
             command: 'generate',
             text: prompt,
             awsAccessKey: awsAccessKey,
             awsSecretKey: awsSecretKey,
-            awsRegion: awsRegion
+            awsRegion: awsRegion,
+            filename: filename
           });
         }
 
