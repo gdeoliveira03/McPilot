@@ -46,19 +46,23 @@ async function generateTerraform(context) {
             .replace(/\$\{aws_secret_key\}/g, awsSecretKey)
             .replace(/\$\{aws_region\}/g, awsRegion);
           
-          const workspaceFolders = vscode.workspace.workspaceFolders;
-          if (!workspaceFolders) {
-            vscode.window.showErrorMessage("No workspace folder open.");
+          // Allows user to select a directory to store terraform template
+          const uri = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.file(filename),
+            filters: {
+              'Terraform files': ['tf'],
+              'All files': ['*']
+            }
+          });
+
+          if (!uri) {
+            vscode.window.showErrorMessage("No file selected.");
             return;
           }
 
-          const workspaceFolder = workspaceFolders[0].uri.fsPath;
-          const filePath = `${workspaceFolder}/${filename}`;
-
-          const fileUri = vscode.Uri.file(filePath);
-          await vscode.workspace.fs.writeFile(fileUri, Buffer.from(finalTerraformCode, 'utf8'));
-
-          const document = await vscode.workspace.openTextDocument(fileUri);
+          await vscode.workspace.fs.writeFile(uri, Buffer.from(finalTerraformCode, 'utf8'));
+          
+          const document = await vscode.workspace.openTextDocument(uri);
           await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
           panel.webview.postMessage({ command: "progress", text: "" });
         } catch (error) {
