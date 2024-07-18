@@ -131,6 +131,7 @@ function getWebviewContent() {
           document.getElementById('terraformPrompt').classList.add('hidden');
           document.getElementById('awsCredentials').classList.remove('hidden');
           document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+          vscode.postMessage({ command: 'clearProgress' });
         }
 
         function generateCode() {
