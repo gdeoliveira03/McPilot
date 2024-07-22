@@ -63,13 +63,12 @@ async function generateTerraform(context) {
           });
           await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
 
-          const filePath = path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates",
-            filename
-          );
+          const templatesDir = path.join(__dirname, "..", "..", "templates");
+          if (!fs.existsSync(templatesDir)) {
+            fs.mkdirSync(templatesDir, { recursive: true });
+          }
+
+          const filePath = path.join(templatesDir, filename);
           console.log(filePath);
 
           fs.writeFileSync(filePath, finalTerraformCode);
