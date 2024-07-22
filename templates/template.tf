@@ -1,21 +1,17 @@
-# Configure the AWS Provider
+# Provider block
 provider "aws" {
   access_key = "AKIA5FTY7LMXSTTDLFXM"
   secret_key = "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"
   region     = "us-east-1"
 }
 
-# Create an EC2 Instance
-resource "aws_instance" "web" {
-  ami           = "ami-0dc2d3e4c0f9ebd18" # Amazon Linux 2 AMI (HVM), SSD Volume Type
+# Resource block
+resource "aws_instance" "example" {
+  ami           = "ami-0be2609ba883822ec"
   instance_type = "t2.micro"
-
-  tags = {
-    Name = "HelloWorld"
-  }
 }
 
-# Output the Public IP Address
-output "public_ip" {
-  value = aws_instance.web.public_ip
+# Output block
+output "instance_id" {
+  value = "${aws_instance.example.id}"
 }
