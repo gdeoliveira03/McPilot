@@ -11,7 +11,7 @@ const { getWebviewContent } = require("../views/webviewContent.js");
 async function generateTerraform(context) {
   const panel = vscode.window.createWebviewPanel(
     "terraformCodeGenerator",
-    "Terraform Code Generator",
+    "McPilot",
     vscode.ViewColumn.Two,
     {
       enableScripts: true,
@@ -37,7 +37,7 @@ async function generateTerraform(context) {
         }
 
         const refinedPrompt = preprocessPrompt(prompt);
-
+        
         panel.webview.postMessage({
           command: "progress",
           text: "Generating Terraform configuration...",
