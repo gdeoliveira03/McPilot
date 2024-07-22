@@ -30,7 +30,7 @@ function getWebviewContent(panel) {
       <div class="input-with-icon">
         <input type="password" id="awsAccessKey">
         <button type="button" class="toggle-visibility" onclick="toggleVisibility('awsAccessKey')">
-          <span id="awsAccessKeyIcon" class="material-icons-outlined">visibility</span>
+          <span id="awsAccessKeyIcon" class="material-icons-outlined">visibility_off</span>
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@ function getWebviewContent(panel) {
       <div class="input-with-icon">
         <input type="password" id="awsSecretKey">
         <button type="button" class="toggle-visibility" onclick="toggleVisibility('awsSecretKey')">
-          <span id="awsSecretKeyIcon" class="material-icons-outlined">visibility</span>
+          <span id="awsSecretKeyIcon" class="material-icons-outlined">visibility_off</span>
         </button>
       </div>
     </div>
@@ -139,11 +139,11 @@ function getWebviewContent(panel) {
       const icon = document.getElementById(fieldId + 'Icon');
       if (field.type === 'password') {
         field.type = 'text';
-        icon.textContent = 'visibility_off';
+        icon.textContent = 'visibility';
         startVisibilityTimeout(fieldId);
       } else {
         field.type = 'password';
-        icon.textContent = 'visibility';
+        icon.textContent = 'visibility_off';
         clearTimeout(visibilityTimeouts[fieldId]);
       }
     }
