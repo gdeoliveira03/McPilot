@@ -5,25 +5,55 @@ body {
   align-items: center;
   padding: 10px;
   margin: 20px;
+  background-color: #1e1e1e; 
+  color: #e5e5e5; 
+  position: relative; 
 }
+
+body.light-mode {
+  background-color: #ffffff;
+  color: #333;
+}
+
+textarea {
+  width: 100%;
+  max-width: 300px; 
+  margin-bottom: 20px;
+  margin-top: 20px;
+  background-color: #fff;
+  color: #333; 
+  border: 1px solid #ccc; 
+  padding: 10px; 
+}
+
+body.light-mode textarea {
+  background-color: #333; 
+  color: #e5e5e5; 
+}
+
+textarea::placeholder {
+  color: #777;
+}
+
+body.light-mode textarea::placeholder {
+  color: #fff; 
+}
+
 .centered-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  max-width: 300px;
+  max-width: 300px; 
   margin-top: 20px;
 }
-textarea {
-  width: 100%;
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
+
 .button-container {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
+
 button {
   background-color: purple;
   color: white;
@@ -32,34 +62,53 @@ button {
   cursor: pointer;
   border-radius: 10px; 
 }
+
 button:hover {
-  background-color: darkmagenta;
+  background-color: purple;
 }
+
 #progress {
   margin-top: 10px;
-  color: #333;
 }
+
+body.light-mode #progress {
+  color: #333; 
+}
+
 .hidden {
   display: none;
 }
+
 .input-group {
   margin-bottom: 10px;
   width: 100%;
 }
+
 label {
   display: block;
   margin-bottom: 5px;
 }
+
 .input-with-icon {
   position: relative;
   width: 100%;
 }
+
 input[type="text"], input[type="password"] {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
-  padding-right: 30px; /* Add some padding to the right for the icon */
+  padding-right: 30px; 
+  background-color: #fff; 
+  color: #333; 
+  border: 1px solid #ccc;
 }
+
+body.light-mode input[type="text"], body.light-mode input[type="password"] {
+  background-color: #333; 
+  color: #e5e5e5;
+}
+
 .toggle-visibility {
   position: absolute;
   right: 10px;
@@ -70,28 +119,57 @@ input[type="text"], input[type="password"] {
   cursor: pointer;
   font-size: 1.2em;
   padding: 0;
-  color: black; /* Set the icon color to black */
+  color: #333; 
 }
-.toggle-visibility:hover {
-  background: none; /* Ensure no background color on hover */
-  outline: none; /* Remove any outline on hover */
-  color: black; /* Ensure the icon color remains black on hover */
+
+body.light-mode .toggle-visibility {
+  color: #e5e5e5;
 }
+
 .centered-button {
   display: flex;
   justify-content: center;
   width: 100%;
   margin: 15px;
 }
+
 .centered {
   text-align: center;
   width: 100%;
   margin-top: -10px;
 }
-#progress {
-  margin-top: 20px;
-  color: grey;
+
+.theme-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #e5e5e5; 
 }
+
+.theme-button:hover {
+  background: none;
+  color: #fff; 
+}
+
+body.light-mode .theme-button {
+  color: #333; 
+}
+
+body.light-mode .theme-button:hover {
+  background: none;
+  color: #000;
+}
+
+button.toggle-visibility:hover,
+button.theme-button:hover {
+  background: none;
+}
+
 .material-icons-outlined {
   font-family: 'Material Icons Outlined';
   font-weight: normal;
@@ -106,5 +184,4 @@ input[type="text"], input[type="password"] {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  color: black; /* Set the icon color to black */
 }

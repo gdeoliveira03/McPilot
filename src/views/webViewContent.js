@@ -17,6 +17,9 @@ function getWebviewContent(panel) {
 </head>
 <body>
   <h1>McPilot</h1>
+  <button class="theme-button" onclick="toggleTheme()">
+    <span id="theme-icon" class="material-icons-outlined">dark_mode</span>
+  </button>
   <div id="awsCredentialsTitle" class="centered">
     <h3>To get started, enter the filename and your AWS account information:</h3>
   </div>
@@ -80,12 +83,12 @@ function getWebviewContent(panel) {
       document.getElementById('awsCredentialsTitle').classList.add('hidden');
     }
 
-        function goBack() {
-          document.getElementById('terraformPrompt').classList.add('hidden');
-          document.getElementById('awsCredentials').classList.remove('hidden');
-          document.getElementById('awsCredentialsTitle').classList.remove('hidden');
-          vscode.postMessage({ command: 'clearProgress' });
-        }
+    function goBack() {
+      document.getElementById('terraformPrompt').classList.add('hidden');
+      document.getElementById('awsCredentials').classList.remove('hidden');
+      document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+      vscode.postMessage({ command: 'clearProgress' });
+    }
 
     function generateCode() {
       const prompt = document.getElementById('prompt').value;
@@ -127,6 +130,27 @@ function getWebviewContent(panel) {
         icon.textContent = 'visibility';
       }, 10000); // 10 seconds in milliseconds
     }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const themeIcon = document.getElementById('theme-icon');
+      if (document.body.classList.contains('light-mode')) {
+        themeIcon.textContent = 'light_mode';
+      } else {
+        themeIcon.textContent = 'dark_mode';
+      }
+    }
+
+    function applyInitialTheme() {
+      const isLightTheme = document.body.classList.contains('vscode-light');
+      if (isLightTheme) {
+        document.body.classList.add('light-mode');
+        const themeIcon = document.getElementById('theme-icon');
+        themeIcon.textContent = 'light_mode';
+      }
+    }
+
+    applyInitialTheme();
 
     window.addEventListener('message', event => {
       const message = event.data;
