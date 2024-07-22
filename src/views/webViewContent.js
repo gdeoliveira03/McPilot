@@ -80,11 +80,12 @@ function getWebviewContent(panel) {
       document.getElementById('awsCredentialsTitle').classList.add('hidden');
     }
 
-    function goBack() {
-      document.getElementById('terraformPrompt').classList.add('hidden');
-      document.getElementById('awsCredentials').classList.remove('hidden');
-      document.getElementById('awsCredentialsTitle').classList.remove('hidden');
-    }
+        function goBack() {
+          document.getElementById('terraformPrompt').classList.add('hidden');
+          document.getElementById('awsCredentials').classList.remove('hidden');
+          document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+          vscode.postMessage({ command: 'clearProgress' });
+        }
 
     function generateCode() {
       const prompt = document.getElementById('prompt').value;

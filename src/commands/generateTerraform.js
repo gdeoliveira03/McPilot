@@ -64,12 +64,14 @@ async function generateTerraform(context) {
           
           const document = await vscode.workspace.openTextDocument(uri);
           await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
-          panel.webview.postMessage({ command: "progress", text: "" });
+          panel.webview.postMessage({ command: "progress", text: "Please review the generated template and edit changes before saving." });
         } catch (error) {
           vscode.window.showErrorMessage(
             `Failed to generate Terraform configuration: ${error.message}`
           );
         }
+      } else if (message.command === "clearProgress") {
+        panel.webview.postMessage({ command: "progress", text: "" });
       }
     },
     undefined,
