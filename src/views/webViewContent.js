@@ -45,7 +45,29 @@ function getWebviewContent(panel) {
     </div>
     <div class="input-group">
       <label>AWS Region:</label>
-      <input type="text" id="awsRegion">
+      <select id="awsRegion">
+        <option value="us-east-1">US East (N. Virginia)</option>
+        <option value="us-east-2">US East (Ohio)</option>
+        <option value="us-west-1">US West (N. California)</option>
+        <option value="us-west-2">US West (Oregon)</option>
+        <option value="af-south-1">Africa (Cape Town)</option>
+        <option value="ap-east-1">Asia Pacific (Hong Kong)</option>
+        <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+        <option value="ap-northeast-3">Asia Pacific (Osaka)</option>
+        <option value="ap-northeast-2">Asia Pacific (Seoul)</option>
+        <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+        <option value="ap-southeast-2">Asia Pacific (Sydney)</option>
+        <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+        <option value="ca-central-1">Canada (Central)</option>
+        <option value="eu-central-1">Europe (Frankfurt)</option>
+        <option value="eu-west-1">Europe (Ireland)</option>
+        <option value="eu-west-2">Europe (London)</option>
+        <option value="eu-south-1">Europe (Milan)</option>
+        <option value="eu-west-3">Europe (Paris)</option>
+        <option value="eu-north-1">Europe (Stockholm)</option>
+        <option value="me-south-1">Middle East (Bahrain)</option>
+        <option value="sa-east-1">South America (São Paulo)</option>
+      </select>
     </div>
     <div class="centered-button">
       <button onclick="enterCredentials()">Continue</button>
@@ -80,12 +102,12 @@ function getWebviewContent(panel) {
       document.getElementById('awsCredentialsTitle').classList.add('hidden');
     }
 
-        function goBack() {
-          document.getElementById('terraformPrompt').classList.add('hidden');
-          document.getElementById('awsCredentials').classList.remove('hidden');
-          document.getElementById('awsCredentialsTitle').classList.remove('hidden');
-          vscode.postMessage({ command: 'clearProgress' });
-        }
+    function goBack() {
+      document.getElementById('terraformPrompt').classList.add('hidden');
+      document.getElementById('awsCredentials').classList.remove('hidden');
+      document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+      vscode.postMessage({ command: 'clearProgress' });
+    }
 
     function generateCode() {
       const prompt = document.getElementById('prompt').value;
