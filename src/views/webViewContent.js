@@ -89,7 +89,9 @@ function getWebviewContent(panel) {
       <button onclick="generateCode()">Generate</button>
     </div>
   </div>
-  <div id="progress"></div>
+  <div id="message" class="hidden centered-container">
+    <h3 id="messageText"></h3>
+  </div>
   <script>
     const vscode = acquireVsCodeApi();
     let visibilityTimeouts = {};
@@ -114,25 +116,43 @@ function getWebviewContent(panel) {
       document.getElementById('terraformPrompt').classList.add('hidden');
       document.getElementById('awsCredentials').classList.remove('hidden');
       document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+      document.getElementById('message').classList.add('hidden');
       vscode.postMessage({ command: 'clearProgress' });
     }
 
-    function generateCode() {
+   function generateCode() {
       const prompt = document.getElementById('prompt').value;
       const awsAccessKey = document.getElementById('awsAccessKey').value;
       const awsSecretKey = document.getElementById('awsSecretKey').value;
       const awsRegion = document.getElementById('awsRegion').value;
       const filename = document.getElementById('filename').value;
 
-      vscode.postMessage({
-        command: 'generate',
-        text: prompt,
-        awsAccessKey: awsAccessKey,
-        awsSecretKey: awsSecretKey,
-        awsRegion: awsRegion,
-        filename: filename
-      });
+    vscode.postMessage({
+      command: 'generate',
+      text: prompt,
+      awsAccessKey: awsAccessKey,
+      awsSecretKey: awsSecretKey,
+      awsRegion: awsRegion,
+      filename: filename
+    });
+
+    document.getElementById('message').classList.remove('hidden');
+    document.getElementById('messageText').innerText = 'Generating Terraform template...';
     }
+
+  window.addEventListener('message', event => {
+    const message = event.data;
+    switch (message.command) {
+      case 'progress':
+        document.getElementById('message').classList.remove('hidden');
+        document.getElementById('messageText').innerText = message.text;
+        break;
+      case 'templateGenerated':
+        document.getElementById('message').classList.remove('hidden');
+        document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
+        break;
+    }
+  });
 
     function toggleVisibility(fieldId) {
       const field = document.getElementById(fieldId);
@@ -162,7 +182,12 @@ function getWebviewContent(panel) {
       const message = event.data;
       switch (message.command) {
         case 'progress':
-          document.getElementById('progress').innerText = message.text;
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = message.text;
+          break;
+        case 'templateGenerated':
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
           break;
       }
     });

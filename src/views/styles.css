@@ -106,5 +106,15 @@ input[type="text"], input[type="password"] {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  color: black; /* Set the icon color to black */
+  color: black; 
+}
+
+#message {
+  font-size: 12px;
+  font-weight: 100;
+  max-width: 600px;
+  text-align: center;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
 }
