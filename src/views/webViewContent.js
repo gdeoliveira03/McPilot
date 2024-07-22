@@ -78,7 +78,7 @@ function getWebviewContent(panel) {
       </select>
     </div>
     <div class="centered-button">
-      <button onclick="enterCredentials()">Continue</button>
+      <button onclick="enterCredentials()">Enter</button>
     </div>
   </div>
   <div id="terraformPrompt" class="hidden centered-container">
