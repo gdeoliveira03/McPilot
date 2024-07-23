@@ -100,6 +100,11 @@ async function generateTerraform(context) {
               );
             }
           });
+
+          panel.webview.postMessage({
+            command: 'templateGenerated',
+          });
+
         } catch (error) {
           vscode.window.showErrorMessage(
             `Failed to generate Terraform configuration: ${error.message}`
