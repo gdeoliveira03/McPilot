@@ -54,11 +54,14 @@ label {
   position: relative;
   width: 100%;
 }
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], select {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
-  padding-right: 30px; /* Add some padding to the right for the icon */
+  padding-right: 30px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
 .toggle-visibility {
   position: absolute;
@@ -70,12 +73,12 @@ input[type="text"], input[type="password"] {
   cursor: pointer;
   font-size: 1.2em;
   padding: 0;
-  color: black; /* Set the icon color to black */
+  color: black; 
 }
 .toggle-visibility:hover {
-  background: none; /* Ensure no background color on hover */
-  outline: none; /* Remove any outline on hover */
-  color: black; /* Ensure the icon color remains black on hover */
+  background: none; 
+  outline: none; 
+  color: black; 
 }
 .centered-button {
   display: flex;
@@ -108,7 +111,6 @@ input[type="text"], input[type="password"] {
   -webkit-font-smoothing: antialiased;
   color: black; 
 }
-
 #message {
   font-size: 12px;
   font-weight: 100;
