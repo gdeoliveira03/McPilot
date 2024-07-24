@@ -70,12 +70,12 @@ input[type="text"], input[type="password"] {
   cursor: pointer;
   font-size: 1.2em;
   padding: 0;
-  color: black; /* Set the icon color to black */
+  color: black; 
 }
 .toggle-visibility:hover {
-  background: none; /* Ensure no background color on hover */
-  outline: none; /* Remove any outline on hover */
-  color: black; /* Ensure the icon color remains black on hover */
+  background: none;
+  outline: none; 
+  color: black; 
 }
 .centered-button {
   display: flex;
@@ -106,5 +106,26 @@ input[type="text"], input[type="password"] {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  color: black; /* Set the icon color to black */
+  color: black; 
+}
+
+#message {
+  font-size: 12px;
+  font-weight: 100;
+  max-width: 600px;
+  text-align: center;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+button.option-button{
+  background-color: rgb(223, 223, 223);
+  color: black;
+  padding: 5px 7px;
+  margin: 0 9px;
+  font-family: Arial, sans-serif;
+}
+button.option-button:hover{
+  background-color: lightgray;
 }

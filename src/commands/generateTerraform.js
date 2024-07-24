@@ -8,6 +8,11 @@ const { preprocessPrompt } = require("../utils/prompt.js");
 const { getTerraformCode } = require("../utils/api.js");
 const { getWebviewContent } = require("../views/webviewContent.js");
 
+const predefinedTemplates = {
+  "Provision an EC2 instance": "Provision an EC2 instance",
+  "Transfer files to an S3 bucket": "Transfer files to an S3 bucket",
+};
+
 async function generateTerraform(context) {
   const panel = vscode.window.createWebviewPanel(
     "terraformCodeGenerator",
@@ -100,6 +105,11 @@ async function generateTerraform(context) {
               );
             }
           });
+
+          panel.webview.postMessage({
+            command: 'templateGenerated',
+          });
+
         } catch (error) {
           vscode.window.showErrorMessage(
             `Failed to generate Terraform configuration: ${error.message}`

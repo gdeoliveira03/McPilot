@@ -30,7 +30,7 @@ function getWebviewContent(panel) {
       <div class="input-with-icon">
         <input type="password" id="awsAccessKey">
         <button type="button" class="toggle-visibility" onclick="toggleVisibility('awsAccessKey')">
-          <span id="awsAccessKeyIcon" class="material-icons-outlined">visibility</span>
+          <span id="awsAccessKeyIcon" class="material-icons-outlined">visibility_off</span>
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@ function getWebviewContent(panel) {
       <div class="input-with-icon">
         <input type="password" id="awsSecretKey">
         <button type="button" class="toggle-visibility" onclick="toggleVisibility('awsSecretKey')">
-          <span id="awsSecretKeyIcon" class="material-icons-outlined">visibility</span>
+          <span id="awsSecretKeyIcon" class="material-icons-outlined">visibility_off</span>
         </button>
       </div>
     </div>
@@ -83,13 +83,19 @@ function getWebviewContent(panel) {
   </div>
   <div id="terraformPrompt" class="hidden centered-container">
     <h3 class="centered">What can I do for you today?</h3>
+    <div class="button-container">
+      <button class= "option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
+      <button class= "option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
+    </div>
     <textarea id="prompt" rows="10" placeholder="Describe the terraform template you want to generate"></textarea>
     <div class="button-container">
       <button onclick="goBack()">Back</button>
       <button onclick="generateCode()">Generate</button>
     </div>
   </div>
-  <div id="progress"></div>
+  <div id="message" class="hidden centered-container">
+    <h3 id="messageText"></h3>
+  </div>
   <script>
     const vscode = acquireVsCodeApi();
     let visibilityTimeouts = {};
@@ -114,7 +120,32 @@ function getWebviewContent(panel) {
       document.getElementById('terraformPrompt').classList.add('hidden');
       document.getElementById('awsCredentials').classList.remove('hidden');
       document.getElementById('awsCredentialsTitle').classList.remove('hidden');
+      document.getElementById('message').classList.add('hidden');
       vscode.postMessage({ command: 'clearProgress' });
+    }
+
+    function generatePredefinedCode(templateType) {
+      const awsAccessKey = document.getElementById('awsAccessKey').value;
+      const awsSecretKey = document.getElementById('awsSecretKey').value;
+      const awsRegion = document.getElementById('awsRegion').value;
+      const filename = document.getElementById('filename').value;
+
+      if (!awsAccessKey || !awsSecretKey || !awsRegion || !filename) {
+        alert('Please fill in all AWS credentials');
+        return;
+      }
+
+      vscode.postMessage({
+        command: 'generate',
+        text: templateType,
+        awsAccessKey: awsAccessKey,
+        awsSecretKey: awsSecretKey,
+        awsRegion: awsRegion,
+        filename: filename
+      });
+
+      document.getElementById('message').classList.remove('hidden');
+      document.getElementById('messageText').innerText = 'Generating Terraform template...';
     }
 
     function generateCode() {
@@ -132,6 +163,9 @@ function getWebviewContent(panel) {
         awsRegion: awsRegion,
         filename: filename
       });
+
+      document.getElementById('message').classList.remove('hidden');
+      document.getElementById('messageText').innerText = 'Generating Terraform template...';
     }
 
     function toggleVisibility(fieldId) {
@@ -139,11 +173,11 @@ function getWebviewContent(panel) {
       const icon = document.getElementById(fieldId + 'Icon');
       if (field.type === 'password') {
         field.type = 'text';
-        icon.textContent = 'visibility_off';
+        icon.textContent = 'visibility';
         startVisibilityTimeout(fieldId);
       } else {
         field.type = 'password';
-        icon.textContent = 'visibility';
+        icon.textContent = 'visibility_off';
         clearTimeout(visibilityTimeouts[fieldId]);
       }
     }
@@ -162,7 +196,12 @@ function getWebviewContent(panel) {
       const message = event.data;
       switch (message.command) {
         case 'progress':
-          document.getElementById('progress').innerText = message.text;
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = message.text;
+          break;
+        case 'templateGenerated':
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
           break;
       }
     });
