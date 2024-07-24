@@ -23,7 +23,7 @@ function getWebviewContent(panel) {
   <div id="awsCredentials" class="centered-container">
     <div class="input-group">
       <label>Filename: <small>(name for the generated file)</small></label>
-      <input type="text" id="filename" placeholder="Enter desired filename, e.g., template.tf"><br>
+      <input class= "filenameplace" type="text" id="filename" placeholder="Enter desired filename, e.g., template.tf"><br>
     </div>
     <div class="input-group">
       <label>AWS Access Key:</label>
@@ -46,6 +46,7 @@ function getWebviewContent(panel) {
     <div class="input-group">
       <label>AWS Region:</label>
       <select id="awsRegion">
+        <option value="">Select a region</option>
         <option value="us-east-2">US East (Ohio)</option>
         <option value="us-east-1">US East (Virginia)</option>
         <option value="us-west-1">US West (N. California)</option>
@@ -98,7 +99,7 @@ function getWebviewContent(panel) {
   </div>
   <script>
     const vscode = acquireVsCodeApi();
-    let visibilityTimeouts = {};
+     let visibilityTimeouts = {};
 
     function enterCredentials() {
       const awsAccessKey = document.getElementById('awsAccessKey').value;
@@ -107,7 +108,10 @@ function getWebviewContent(panel) {
       const filename = document.getElementById('filename').value;
 
       if (!awsAccessKey || !awsSecretKey || !awsRegion || !filename) {
-        alert('Please fill in all AWS credentials');
+        vscode.postMessage({
+          command: 'showError',
+          text: 'Please fill in all the fields before continuing.'
+        });
         return;
       }
 
@@ -155,6 +159,14 @@ function getWebviewContent(panel) {
       const awsRegion = document.getElementById('awsRegion').value;
       const filename = document.getElementById('filename').value;
 
+      if (!prompt || !filename) {
+        vscode.postMessage({
+          command: 'showError',
+          text: 'Description and filename are required.'
+        });
+        return;
+      }
+
       vscode.postMessage({
         command: 'generate',
         text: prompt,
@@ -166,9 +178,23 @@ function getWebviewContent(panel) {
 
       document.getElementById('message').classList.remove('hidden');
       document.getElementById('messageText').innerText = 'Generating Terraform template...';
-    }
+      }
 
-    function toggleVisibility(fieldId) {
+    window.addEventListener('message', event => {
+      const message = event.data;
+      switch (message.command) {
+        case 'progress':
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = message.text;
+          break;
+        case 'templateGenerated':
+          document.getElementById('message').classList.remove('hidden');
+          document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
+          break;
+      }
+    });
+
+      function toggleVisibility(fieldId) {
       const field = document.getElementById(fieldId);
       const icon = document.getElementById(fieldId + 'Icon');
       if (field.type === 'password') {
@@ -188,7 +214,7 @@ function getWebviewContent(panel) {
         const field = document.getElementById(fieldId);
         const icon = document.getElementById(fieldId + 'Icon');
         field.type = 'password';
-        icon.textContent = 'visibility';
+        icon.textContent = 'visibility_off';
       }, 10000); // 10 seconds in milliseconds
     }
 
@@ -202,6 +228,9 @@ function getWebviewContent(panel) {
         case 'templateGenerated':
           document.getElementById('message').classList.remove('hidden');
           document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
+          break;
+        case 'showError':
+          vscode.postMessage({ command: 'showError', text: message.text });
           break;
       }
     });
