@@ -1,0 +1,24 @@
+#A variable can be used to easily change the region later on
+variable "region" {
+  type = string
+  default = "us-east-2"
+}
+
+#Initializing the AWS provider with the given access and secret keys
+provider "aws" {
+  access_key = "kjn"
+  secret_key = "kjnkj"
+  region = var.region
+}
+
+#Creating an AWS instance with the given region
+resource "aws_instance" "example" {
+  ami = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  #Other configuration options can be added here as needed
+}
+
+#Outputting the public IP address of the created instance
+output "public_ip" {
+  value = aws_instance.example.public_ip
+}

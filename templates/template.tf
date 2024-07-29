@@ -1,11 +1,12 @@
+# Terraform template:
+
 provider "aws" {
-  access_key = "AKIAQE43KICUS4ZVOZ5N"
-  secret_key = "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"
-  region     = "us-east-1"
+  access_key = "asdqwe124"
+  secret_key = "qesafd"
+  region     = "us-east-2"
 }
 
-resource "aws_instance" "example" {
-  ami                    = "ami-0c55b159cbfafe1f0"
-  instance_type          = "t2.micro"
-  associate_public_ip_address = true
+resource "aws_instance" "ec2_instance" {
+  ami           = "ami-0d5d9d301c853a04a"
+  instance_type = "t2.micro"
 }
