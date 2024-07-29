@@ -1,0 +1,29 @@
+# This is a Terraform template used to create an AWS EC2 instance
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "3.61.0"
+    }
+  }
+}
+
+# Set the access key and secret key as environment variables
+provider "aws" {
+  access_key = "f"
+  secret_key = "f"
+  region = "us-east-1"
+}
+
+# Create a new AWS EC2 instance
+resource "aws_instance" "example" {
+  ami = "ami-00ddb0e5626798373"
+  instance_type = "t2.micro"
+  key_name = "example_key"
+  security_groups = ["example_security_group"]
+}
+
+# Output the public IP address of the instance
+output "public_ip" {
+  value = aws_instance.example.public_ip
+}
