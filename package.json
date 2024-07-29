@@ -3,6 +3,11 @@
   "displayName": "McPilot",
   "description": "",
   "version": "0.0.1",
+  "publisher": "mcpilot",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gdeoliveira03/McPilot.git"
+  },
   "engines": {
     "vscode": "^1.91.0"
   },
