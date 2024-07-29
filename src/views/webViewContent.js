@@ -4,7 +4,9 @@ const vscode = require('vscode');
 function getWebviewContent(panel) {
   const cssPath = vscode.Uri.file(path.join(__dirname, 'styles.css'));
   const cssUri = panel.webview.asWebviewUri(cssPath);
-
+  const logoPath = vscode.Uri.file(path.join('c:\\Users\\kirkrish2\\Downloads\\McPilot-1\\resources', 'file.png'));
+  const logoUri = panel.webview.asWebviewUri(logoPath);
+  
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +25,7 @@ function getWebviewContent(panel) {
   <div id="awsCredentials" class="centered-container">
     <div class="input-group">
       <label>Filename: <small>(name for the generated file)</small></label>
-      <input class= "filenameplace" type="text" id="filename" placeholder="Enter desired filename, e.g., template.tf"><br>
+      <input class="filenameplace" type="text" id="filename" placeholder="Enter desired filename, e.g., template.tf"><br>
     </div>
     <div class="input-group">
       <label>AWS Access Key:</label>
@@ -83,23 +85,30 @@ function getWebviewContent(panel) {
     </div>
   </div>
   <div id="terraformPrompt" class="hidden centered-container">
-    <h3 class="centered">What can I do for you today?</h3>
-    <div class="button-container">
-      <button class= "option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
-      <button class= "option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
-    </div>
-    <textarea id="prompt" rows="10" placeholder="Describe the terraform template you want to generate"></textarea>
-    <div class="button-container">
-      <button onclick="goBack()">Back</button>
-      <button onclick="generateCode()">Generate</button>
+  <div class="logo-container">
+    <div class="logo">
+      <img src="${logoUri}" alt="logo">
     </div>
   </div>
+  <h3 class="centered-2">What can I do for you today?</h3>
+  <div class="panel-background">
+  <div class="button-container">
+    <button class="option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
+    <button class="option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
+  </div>
+  <textarea id="prompt" rows="2" placeholder="Describe the terraform template you want to generate"></textarea>
+  </div>
+  <div class="button-container-bg">
+    <button onclick="goBack()">Back</button>
+    <button onclick="generateCode()">Generate</button>
+  </div>
+</div>
   <div id="message" class="hidden centered-container">
     <h3 id="messageText"></h3>
   </div>
   <script>
     const vscode = acquireVsCodeApi();
-     let visibilityTimeouts = {};
+    let visibilityTimeouts = {};
 
     function enterCredentials() {
       const awsAccessKey = document.getElementById('awsAccessKey').value;
@@ -178,7 +187,7 @@ function getWebviewContent(panel) {
 
       document.getElementById('message').classList.remove('hidden');
       document.getElementById('messageText').innerText = 'Generating Terraform template...';
-      }
+    }
 
     window.addEventListener('message', event => {
       const message = event.data;
@@ -191,10 +200,13 @@ function getWebviewContent(panel) {
           document.getElementById('message').classList.remove('hidden');
           document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
           break;
+        case 'showError':
+          vscode.postMessage({ command: 'showError', text: message.text });
+          break;
       }
     });
 
-      function toggleVisibility(fieldId) {
+    function toggleVisibility(fieldId) {
       const field = document.getElementById(fieldId);
       const icon = document.getElementById(fieldId + 'Icon');
       if (field.type === 'password') {

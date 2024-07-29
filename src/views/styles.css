@@ -6,59 +6,92 @@ body {
   padding: 10px;
   margin: 20px;
 }
+
 .centered-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
   max-width: 300px;
   margin-top: 20px;
 }
-textarea {
-  width: 100%;
-  margin-bottom: 20px;
-  margin-top: 20px;
+
+.panel-background {
+  background-color: black;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px; 
+  width: 400px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-input#filename::placeholder{
+textarea {
+  width: 80%;
+  margin-top: 20px;
+  margin-left: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  resize: vertical;
+}
+
+input#filename::placeholder {
   font-size: 14px;
+  color: #999;
+}
+
+.button-container, .button-container-bg {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; 
+  max-width: 100%;
+  padding: 0 10px; 
 }
 
 .button-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+  margin-left: 20px;
+  width: 80%;
 }
+
+.button-container-bg {
+  margin-top: 40px; 
+}
+
 button {
-  background-color: purple;
-  color: white;
+  background-color: #FFC72C;
+  color: black;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
-  border-radius: 10px; 
+  border-radius: 10px;
 }
+
 button:hover {
-  background-color: darkmagenta;
+  background-color: #FFC72C;
 }
-#progress {
-  margin-top: 10px;
-  color: #333;
-}
+
 .hidden {
   display: none;
 }
+
 .input-group {
   margin-bottom: 10px;
   width: 100%;
 }
+
 label {
   display: block;
   margin-bottom: 5px;
 }
+
 .input-with-icon {
   position: relative;
   width: 100%;
 }
+
 input[type="text"], input[type="password"], select {
   width: 100%;
   padding: 8px;
@@ -68,6 +101,7 @@ input[type="text"], input[type="password"], select {
   border-radius: 5px;
   font-size: 16px;
 }
+
 .toggle-visibility {
   position: absolute;
   right: 10px;
@@ -80,27 +114,40 @@ input[type="text"], input[type="password"], select {
   padding: 0;
   color: black; 
   color: black; 
-}
-.toggle-visibility:hover {
-  background: none; 
-  outline: none; 
+  color: black; 
+  color: black;
   color: black; 
 }
+
+.toggle-visibility:hover {
+  color: #000;
+}
+
 .centered-button {
   display: flex;
   justify-content: center;
   width: 100%;
   margin: 15px;
 }
+
 .centered {
   text-align: center;
   width: 100%;
   margin-top: -10px;
 }
+
+.centered-2 {
+  text-align: center;
+  width: 100%;
+  margin-top: -10px;
+  margin-bottom: 60px;
+}
+
 #progress {
   margin-top: 20px;
   color: grey;
 }
+
 .material-icons-outlined {
   font-family: 'Material Icons Outlined';
   font-weight: normal;
@@ -115,10 +162,10 @@ input[type="text"], input[type="password"], select {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  color: black; 
 }
+
 #message {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 100;
   max-width: 600px;
   text-align: center;
@@ -127,13 +174,33 @@ input[type="text"], input[type="password"], select {
   justify-content: center;
 }
 
-button.option-button{
+button.option-button {
   background-color: rgb(223, 223, 223);
   color: black;
   padding: 5px 7px;
   margin: 0 9px;
   font-family: Arial, sans-serif;
 }
-button.option-button:hover{
+
+button.option-button:hover {
   background-color: lightgray;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center; 
+  width: 100%; 
+  margin-top: -30px;
+  margin-bottom: 20px; 
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo img {
+  width: 80px;
+  height: 80px;
 }
