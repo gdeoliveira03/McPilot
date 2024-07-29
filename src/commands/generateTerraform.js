@@ -43,7 +43,7 @@ async function generateTerraform(context) {
           }
 
           const refinedPrompt = preprocessPrompt(prompt);
-          
+
           panel.webview.postMessage({
             command: "progress",
             text: "Generating Terraform configuration...",
@@ -66,7 +66,10 @@ async function generateTerraform(context) {
               content: finalTerraformCode,
               language: "terraform",
             });
-            await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+            await vscode.window.showTextDocument(
+              document,
+              vscode.ViewColumn.One
+            );
 
             const templatesDir = path.join(__dirname, "..", "..", "templates");
             if (!fs.existsSync(templatesDir)) {
@@ -86,7 +89,7 @@ async function generateTerraform(context) {
             const s3 = new AWS.S3();
 
             const params = {
-              Bucket: "mcpilotbucket",
+              Bucket: "mcpilots3bucket",
               Key: filename,
               Body: fs.readFileSync(filePath),
             };
@@ -104,9 +107,8 @@ async function generateTerraform(context) {
             });
 
             panel.webview.postMessage({
-              command: 'templateGenerated',
+              command: "templateGenerated",
             });
-
           } catch (error) {
             vscode.window.showErrorMessage(
               `Failed to generate Terraform configuration: ${error.message}`
