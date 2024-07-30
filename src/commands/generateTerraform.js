@@ -5,7 +5,7 @@ const AWS = require("aws-sdk");
 const path = require("path");
 
 const { preprocessPrompt } = require("../utils/prompt.js");
-const { getTerraformCode } = require("../utils/api.js");
+const { getTerraformCode, terraformTemplates } = require("../utils/api.js");
 const { getWebviewContent } = require("../views/webviewContent.js");
 
 const predefinedTemplates = {
@@ -50,10 +50,13 @@ async function generateTerraform(context) {
           });
 
           try {
-            const fullPrompt = `${refinedPrompt}
-            AWS Access Key: ${awsAccessKey}
-            AWS Secret Key: ${awsSecretKey}
-            AWS Region: ${awsRegion}`;
+            const templateContent = Object.values(terraformTemplates).join("\n\n");
+            const fullPrompt = `${refinedPrompt}\n\n
+                                AWS Access Key: ${awsAccessKey}\n\n
+                                AWS Secret Key: ${awsSecretKey}\n\n
+                                AWS Region: ${awsRegion}\n\n
+                                Terraform Templates provided:\n
+                                ${templateContent}`;
 
             const terraformCode = await getTerraformCode(fullPrompt);
 
