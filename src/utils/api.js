@@ -1,11 +1,35 @@
 require('dotenv').config({
     path: `${__dirname}/../../.env`
 });
+
+const fs = require('fs');
+const path = require('path');
   
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT;
 const DEPLOYMENT_ID = "pilot";
 const API_VERSION = "2023-09-15-preview";
+
+function readTerraformFiles(directory) {
+    const files = fs.readdirSync(directory);
+    let templates = {};
+
+    files.forEach(file => {
+        const fullPath = path.join(directory, file);
+        const stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+            templates = { ...templates, ...readTerraformFiles(fullPath) };
+        } else if (path.extname(fullPath) === '.tf') {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            templates[fullPath] = content;
+        }
+    });
+
+    return templates;
+}
+
+const terraformTemplates = readTerraformFiles(path.join(__dirname, '../tf'));
 
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -59,4 +83,5 @@ async function getTerraformCode(prompt, retries = 5, backoff = 1000) {
   
 module.exports = {
     getTerraformCode,
+    terraformTemplates,
 };
