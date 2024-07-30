@@ -1,6 +1,5 @@
 const vscode = require("vscode");
 const fs = require("fs");
-
 const AWS = require("aws-sdk");
 const path = require("path");
 
@@ -69,10 +68,7 @@ async function generateTerraform(context) {
               content: finalTerraformCode,
               language: "terraform",
             });
-            await vscode.window.showTextDocument(
-              document,
-              vscode.ViewColumn.One
-            );
+            await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
 
             const templatesDir = path.join(__dirname, "..", "..", "templates");
             if (!fs.existsSync(templatesDir)) {
@@ -83,35 +79,22 @@ async function generateTerraform(context) {
 
             fs.writeFileSync(filePath, finalTerraformCode);
 
-            AWS.config.update({
-              accessKeyId: awsAccessKey,
-              secretAccessKey: awsSecretKey,
-              region: awsRegion,
-            });
-
-            const s3 = new AWS.S3();
-
-            const params = {
-              Bucket: "mcpilots3bucket",
-              Key: filename,
-              Body: fs.readFileSync(filePath),
-            };
-
-            s3.upload(params, function (err, data) {
-              if (err) {
-                vscode.window.showErrorMessage(
-                  `Failed to upload file to S3: ${err.message}`
-                );
-              } else {
-                vscode.window.showInformationMessage(
-                  `File uploaded successfully to ${data.Location}`
-                );
-              }
-            });
-
             panel.webview.postMessage({
               command: "templateGenerated",
             });
+
+            // Ask user if they want to upload the file
+            vscode.window.showInformationMessage(
+              "Terraform file generated. Do you want to upload it to S3?",
+              "Yes", "No"
+            ).then(selection => {
+              if (selection === "Yes") {
+                uploadToS3(filePath, filename, awsAccessKey, awsSecretKey, awsRegion);
+              } else {
+                vscode.window.showInformationMessage('File upload cancelled.');
+              }
+            });
+
           } catch (error) {
             vscode.window.showErrorMessage(
               `Failed to generate Terraform configuration: ${error.message}`
@@ -127,6 +110,29 @@ async function generateTerraform(context) {
     undefined,
     context.subscriptions
   );
+}
+
+function uploadToS3(filePath, filename, awsAccessKey, awsSecretKey, awsRegion) {
+  AWS.config.update({
+    accessKeyId: awsAccessKey,
+    secretAccessKey: awsSecretKey,
+    region: awsRegion,
+  });
+
+  const s3 = new AWS.S3();
+  const params = {
+    Bucket: "mcpilots3bucket",
+    Key: filename,
+    Body: fs.readFileSync(filePath),
+  };
+
+  s3.upload(params, function (err, data) {
+    if (err) {
+      vscode.window.showErrorMessage(`Failed to upload file to S3: ${err.message}`);
+    } else {
+      vscode.window.showInformationMessage(`File uploaded successfully to ${data.Location}`);
+    }
+  });
 }
 
 module.exports = {
