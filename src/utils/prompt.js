@@ -10,6 +10,7 @@ function preprocessPrompt(rawPrompt) {
       5. DO NOT use code block delimiters like \`\`\`terraform or \`\`\`.
       6. DO NOT include any comments or explanations within the code.
       7. Ensure that there are NO duplicate instances.
+      8. Use UNIQUE names for all your resources.
 
       Here is the user's description:
       "${rawPrompt}"
