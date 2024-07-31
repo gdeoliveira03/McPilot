@@ -11,6 +11,7 @@ function preprocessPrompt(rawPrompt) {
       6. DO NOT include any comments or explanations within the code.
       7. Ensure that there are NO duplicate instances.
       8. Use UNIQUE names for all your resources.
+      9. Before returning, ensure that all conditions are met. Most importantly, that there are not any comments, explanations, snippets of the prompt given, or non-code content as said in condition 2. 
 
       Here is the user's description:
       "${rawPrompt}"
