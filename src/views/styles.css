@@ -70,7 +70,11 @@ button {
 }
 
 button:hover {
-  background-color: #FFC72C;
+  background-color: #896b1a;
+}
+
+.material-icons-outlined:hover{
+  background-color: none;
 }
 
 .hidden {
@@ -105,7 +109,7 @@ input[type="text"], input[type="password"], select {
 .toggle-visibility {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 55%;
   transform: translateY(-50%);
   background: none;
   border: none;
@@ -113,14 +117,10 @@ input[type="text"], input[type="password"], select {
   font-size: 1.2em;
   padding: 0;
   color: black; 
-  color: black; 
-  color: black; 
-  color: black;
-  color: black; 
 }
 
-.toggle-visibility:hover {
-  color: #000;
+.toggle-visibility:hover{
+  background:none;
 }
 
 .centered-button {
@@ -183,7 +183,7 @@ button.option-button {
 }
 
 button.option-button:hover {
-  background-color: lightgray;
+  background-color: rgb(133, 133, 133);
 }
 
 .logo-container {
