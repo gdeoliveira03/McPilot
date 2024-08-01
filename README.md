@@ -1,31 +1,35 @@
-# mcpilot README
+# McPilot README
 
-This is the README for your extension "mcpilot". After writing up a brief description, we recommend including the following sections.
+McPilot is a Visual Studio Code extension that serves as a "CoPilot" for engineers working with Terraform and AWS. It allows users to write a prompt describing the desired Terraform template, which McPilot then generates automatically.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Prompt-Based Terraform Generation: Simply describe the AWS infrastructure you need, and McPilot generates the corresponding Terraform template.
+AWS Service Support: Supports a variety of AWS services including EC2, S3, RDS, and more.
+Automatic Deployment: Deploy the generated Terraform templates directly to your AWS environment.
+Integrated with VS Code: Seamlessly integrated into your coding workflow within VS Code.
 
-For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature X\]\(images/feature-x.png\)
+Here are some screenshots of McPilot in action:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+\!\[Prompt Input\]\(images/prompt-input.png\)
+\!\[Generated Template\]\(images/generated-template.png\)
+Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Terraform: Ensure Terraform is installed and configured on your machine.
+AWS CLI: AWS CLI should be installed and configured with the necessary credentials.
+
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+mcpilot.enable: Enable/disable the McPilot extension.
+mcpilot.apiKey: API key for accessing the McPilot service.
+
 
 ## Known Issues
 
@@ -37,29 +41,14 @@ Users appreciate release notes as you update your extension.
 
 ### 1.0.0
 
-Initial release of ...
+Initial release of McPilot with basic prompt-based Terraform generation.
 
 ### 1.0.1
 
-Fixed issue #.
+Fixed issue with AWS authentication.
 
 ### 1.1.0
 
-Added features X, Y, and Z.
+Added support for additional AWS services and improved template accuracy.
 
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Enjoy using McPilot!**
