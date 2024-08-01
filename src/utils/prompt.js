@@ -12,13 +12,11 @@ function preprocessPrompt(rawPrompt) {
       7. Ensure that there are NO duplicate instances.
       8. Use UNIQUE names for all your resources.
       9. Before returning, ensure that all conditions are met. Most importantly, that there are not any comments, explanations, snippets of the prompt given, or non-code content as said in condition 2. 
+      10. Ensure that all resources have the REQUIRED parameters
+      11. This is my ami for us-east-1: ami-0dc2d3e4c0f9ebd18
 
       Here is the user's description:
       "${rawPrompt}"
-
-      Below is the AWS access key and AWS secret key provided by the user, as well as the region. Alongside that, there are provided Terraform templates given by the organization that have all the proper configurations, properties, and values for whatever may need to be set. These Terraform templates were built specifically for McDonald's. By using these, teams can establish CI/CD pipelines for their applications as per the Cloud DevSecOps Platform team standard.
-
-      Just to make it clear, the user will interact with you through a Visual Studio Code extension by typing in a prompt for a description of the Terraform template they want, and you will return back a Terraform template that automatically gets converted to a .tf file within Visual Studio Code. This is strictly an internal tool for McDonald's engineers to solve the problem of AWS services and data transfers being too tedious and time-consuming to execute manually, so the extension will grab the valid Terraform template you provide and offer the user to automatically upload it to their AWS to execute the function done by whatever it is the user wanted the Terraform template for.
 
       Generate the Terraform template below:
     `;

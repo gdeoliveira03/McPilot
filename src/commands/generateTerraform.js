@@ -4,7 +4,7 @@ const AWS = require("aws-sdk");
 const path = require("path");
 
 const { preprocessPrompt } = require("../utils/prompt.js");
-const { getTerraformCode, terraformTemplates } = require("../utils/api.js");
+const { getTerraformCode } = require("../utils/api.js");
 const { getWebviewContent } = require("../views/webviewContent.js");
 
 const predefinedTemplates = {
@@ -49,13 +49,7 @@ async function generateTerraform(context) {
           });
 
           try {
-            const templateContent = Object.values(terraformTemplates).join("\n\n");
-            const fullPrompt = `${refinedPrompt}\n\n
-                                AWS Access Key: ${awsAccessKey}\n\n
-                                AWS Secret Key: ${awsSecretKey}\n\n
-                                AWS Region: ${awsRegion}\n\n
-                                Terraform Templates provided:\n
-                                ${templateContent}`;
+            const fullPrompt = `${refinedPrompt}\nAWS Access Key: ${awsAccessKey}\nAWS Secret Key: ${awsSecretKey}\nAWS Region: ${awsRegion}`;
 
             const terraformCode = await getTerraformCode(fullPrompt);
 
@@ -68,7 +62,10 @@ async function generateTerraform(context) {
               content: finalTerraformCode,
               language: "terraform",
             });
-            await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+            await vscode.window.showTextDocument(
+              document,
+              vscode.ViewColumn.One
+            );
 
             const templatesDir = path.join(__dirname, "..", "..", "templates");
             if (!fs.existsSync(templatesDir)) {
@@ -84,17 +81,27 @@ async function generateTerraform(context) {
             });
 
             // Ask user if they want to upload the file
-            vscode.window.showInformationMessage(
-              "Terraform file generated. Do you want to upload it to S3?",
-              "Yes", "No"
-            ).then(selection => {
-              if (selection === "Yes") {
-                uploadToS3(filePath, filename, awsAccessKey, awsSecretKey, awsRegion);
-              } else {
-                vscode.window.showInformationMessage('File upload cancelled.');
-              }
-            });
-
+            vscode.window
+              .showInformationMessage(
+                "Terraform file generated. Do you want to upload it to S3?",
+                "Yes",
+                "No"
+              )
+              .then((selection) => {
+                if (selection === "Yes") {
+                  uploadToS3(
+                    filePath,
+                    filename,
+                    awsAccessKey,
+                    awsSecretKey,
+                    awsRegion
+                  );
+                } else {
+                  vscode.window.showInformationMessage(
+                    "File upload cancelled."
+                  );
+                }
+              });
           } catch (error) {
             vscode.window.showErrorMessage(
               `Failed to generate Terraform configuration: ${error.message}`
@@ -128,9 +135,13 @@ function uploadToS3(filePath, filename, awsAccessKey, awsSecretKey, awsRegion) {
 
   s3.upload(params, function (err, data) {
     if (err) {
-      vscode.window.showErrorMessage(`Failed to upload file to S3: ${err.message}`);
+      vscode.window.showErrorMessage(
+        `Failed to upload file to S3: ${err.message}`
+      );
     } else {
-      vscode.window.showInformationMessage(`File uploaded successfully to ${data.Location}`);
+      vscode.window.showInformationMessage(
+        `File uploaded successfully to ${data.Location}`
+      );
     }
   });
 }
