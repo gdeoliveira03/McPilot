@@ -18,7 +18,7 @@ function preprocessPrompt(rawPrompt) {
       Here is the user's description:
       "${rawPrompt}"
 
-      Below is the AWS access key and AWS secret key provided by the user, as well as the region. Alongside that, there are provided Terraform templates given by the organization that have all the proper configurations, properties, and values for whatever may need to be set. These Terraform templates were built specifically for McDonald's. By using these, teams can establish CI/CD pipelines for their applications as per the Cloud DevSecOps Platform team standard.
+      Below is the AWS access key and AWS secret key provided by the user, as well as the region.
 
       Just to make it clear, the user will interact with you through a Visual Studio Code extension by typing in a prompt for a description of the Terraform template they want, and you will return back a Terraform template that automatically gets converted to a .tf file within Visual Studio Code. This is strictly an internal tool for McDonald's engineers to solve the problem of AWS services and data transfers being too tedious and time-consuming to execute manually, so the extension will grab the valid Terraform template you provide and offer the user to automatically upload it to their AWS to execute the function done by whatever it is the user wanted the Terraform template for.
 
