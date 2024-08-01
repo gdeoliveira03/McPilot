@@ -12,7 +12,9 @@ function preprocessPrompt(rawPrompt) {
       7. Ensure that there are NO duplicate instances.
       8. Use UNIQUE names for all your resources.
       9. Before returning, ensure that all conditions are met. Most importantly, that there are not any comments, explanations, snippets of the prompt given, or non-code content as said in condition 2. 
-
+      10. Ensure that all resources have the REQUIRED parameters
+      11. This is my ami for us-east-1: ami-0dc2d3e4c0f9ebd18
+      
       Here is the user's description:
       "${rawPrompt}"
 
