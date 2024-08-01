@@ -1,24 +1,10 @@
-AWS Instance Type: t3a.micro
-            AWS AMI: ami-0e31f956f0392f79c
-           
-# This is a Terraform template to create an AWS instance in us-west-1 region
-
-# Provider section is used to define the cloud provider used in Terraform
 provider "aws" {
   access_key = "d"
   secret_key = "d"
-  region = "us-west-1"
+  region     = "us-west-1"
 }
 
-# Resource section is used to define the resources that will be created in AWS
-# In this case, an AWS instance is being created
-resource "aws_instance" "my_instance" {
-  ami = "ami-0e31f956f0392f79c"
-  instance_type = "t3a.micro"
-}
-
-# Output section is used to display the details of the created resources
-# In this case, the public IP of the instance is being displayed
-output "instance_ip" {
-  value = aws_instance.my_instance.public_ip
+resource "aws_instance" "ec2_instance" {
+  ami           = "ami-12345678"
+  instance_type = "t2.micro"
 }

@@ -1,0 +1,18 @@
+{
+  provider "aws" {
+    access_key = "j"
+    secret_key = "j"
+    region = "ap-northeast-1"
+  }
+
+  resource "aws_s3_bucket" "example_bucket" {
+    bucket = "example_bucket"
+  }
+
+  resource "aws_s3_bucket_object" "example_object" {
+    bucket = aws_s3_bucket.example_bucket.id
+    key = "example_file.txt"
+    source = "local_path/to/example_file.txt"
+    acl = "private"
+  }
+}

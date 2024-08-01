@@ -4,7 +4,7 @@ const vscode = require('vscode');
 function getWebviewContent(panel) {
   const cssPath = vscode.Uri.file(path.join(__dirname, 'styles.css'));
   const cssUri = panel.webview.asWebviewUri(cssPath);
-  const logoPath = vscode.Uri.file(path.join('c:\\Users\\kirkrish2\\Downloads\\McPilot-1\\resources', 'file.png'));
+  const logoPath = vscode.Uri.file(path.join(__dirname, '../../resources/file.png'));
   const logoUri = panel.webview.asWebviewUri(logoPath);
   
   return `
