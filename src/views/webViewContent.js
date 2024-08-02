@@ -229,23 +229,6 @@ function getWebviewContent(panel) {
         icon.textContent = 'visibility_off';
       }, 10000); // 10 seconds in milliseconds
     }
-
-    window.addEventListener('message', event => {
-      const message = event.data;
-      switch (message.command) {
-        case 'progress':
-          document.getElementById('message').classList.remove('hidden');
-          document.getElementById('messageText').innerText = message.text;
-          break;
-        case 'templateGenerated':
-          document.getElementById('message').classList.remove('hidden');
-          document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
-          break;
-        case 'showError':
-          vscode.postMessage({ command: 'showError', text: message.text });
-          break;
-      }
-    });
   </script>
 </body>
 </html>

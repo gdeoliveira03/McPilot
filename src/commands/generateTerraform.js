@@ -45,7 +45,7 @@ async function generateTerraform(context) {
 
           panel.webview.postMessage({
             command: "progress",
-            text: "Generating Terraform configuration...",
+            text: "Generating Terraform template...",
           });
 
           try {
