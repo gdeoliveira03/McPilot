@@ -101,7 +101,7 @@ function getWebviewContent(panel) {
     <div class="button-container-bg">
       <button onclick="goBack()">Back</button>
       <button onclick="generateCode()">Generate</button>
-      <button id="uploadButton" class="hidden" onclick="uploadFile()">Upload to S3</button>
+      <button id="uploadButton" class="hidden upload-button" onclick="uploadFile()">Upload to S3</button>
     </div>
   </div>
   <div id="message" class="hidden centered-container">

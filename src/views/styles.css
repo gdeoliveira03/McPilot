@@ -69,6 +69,15 @@ button {
   border-radius: 10px;
 }
 
+.upload-button {
+  background-color: purple;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
 button:hover {
   background-color: #896b1a;
 }
