@@ -85,24 +85,25 @@ function getWebviewContent(panel) {
     </div>
   </div>
   <div id="terraformPrompt" class="hidden centered-container">
-  <div class="logo-container">
-    <div class="logo">
-      <img src="${logoUri}" alt="logo">
+    <div class="logo-container">
+      <div class="logo">
+        <img src="${logoUri}" alt="logo">
+      </div>
+    </div>
+    <h3 class="centered-2">What can I do for you today?</h3>
+    <div class="panel-background">
+      <div class="button-container">
+        <button class="option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
+        <button class="option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
+      </div>
+      <textarea id="prompt" rows="2" placeholder="Describe the terraform template you want to generate"></textarea>
+    </div>
+    <div class="button-container-bg">
+      <button onclick="goBack()">Back</button>
+      <button onclick="generateCode()">Generate</button>
+      <button id="uploadButton" class="hidden" onclick="uploadFile()">Upload to S3</button>
     </div>
   </div>
-  <h3 class="centered-2">What can I do for you today?</h3>
-  <div class="panel-background">
-  <div class="button-container">
-    <button class="option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
-    <button class="option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
-  </div>
-  <textarea id="prompt" rows="2" placeholder="Describe the terraform template you want to generate"></textarea>
-  </div>
-  <div class="button-container-bg">
-    <button onclick="goBack()">Back</button>
-    <button onclick="generateCode()">Generate</button>
-  </div>
-</div>
   <div id="message" class="hidden centered-container">
     <h3 id="messageText"></h3>
   </div>
@@ -159,6 +160,7 @@ function getWebviewContent(panel) {
 
       document.getElementById('message').classList.remove('hidden');
       document.getElementById('messageText').innerText = 'Generating Terraform template...';
+      document.getElementById('uploadButton').classList.add('hidden');
     }
 
     function generateCode() {
@@ -187,24 +189,23 @@ function getWebviewContent(panel) {
 
       document.getElementById('message').classList.remove('hidden');
       document.getElementById('messageText').innerText = 'Generating Terraform template...';
+      document.getElementById('uploadButton').classList.remove('hidden');
     }
 
-    window.addEventListener('message', event => {
-      const message = event.data;
-      switch (message.command) {
-        case 'progress':
-          document.getElementById('message').classList.remove('hidden');
-          document.getElementById('messageText').innerText = message.text;
-          break;
-        case 'templateGenerated':
-          document.getElementById('message').classList.remove('hidden');
-          document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
-          break;
-        case 'showError':
-          vscode.postMessage({ command: 'showError', text: message.text });
-          break;
-      }
-    });
+    function uploadFile() {
+      const awsAccessKey = document.getElementById('awsAccessKey').value;
+      const awsSecretKey = document.getElementById('awsSecretKey').value;
+      const awsRegion = document.getElementById('awsRegion').value;
+      const filename = document.getElementById('filename').value;
+
+      vscode.postMessage({
+        command: 'upload',
+        awsAccessKey: awsAccessKey,
+        awsSecretKey: awsSecretKey,
+        awsRegion: awsRegion,
+        filename: filename
+      });
+    }
 
     function toggleVisibility(fieldId) {
       const field = document.getElementById(fieldId);
@@ -240,6 +241,10 @@ function getWebviewContent(panel) {
         case 'templateGenerated':
           document.getElementById('message').classList.remove('hidden');
           document.getElementById('messageText').innerText = 'Please review the generated template and make necessary changes before saving.';
+          document.getElementById('uploadButton').classList.remove('hidden');
+          break;
+        case 'showUploadButton':
+          document.getElementById('uploadButton').classList.remove('hidden');
           break;
         case 'showError':
           vscode.postMessage({ command: 'showError', text: message.text });
