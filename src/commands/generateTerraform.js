@@ -9,7 +9,7 @@ const { getWebviewContent } = require("../views/webviewContent.js");
 
 const predefinedTemplates = {
   "Provision an EC2 instance": "Provision an EC2 instance",
-  "Transfer files to an S3 bucket": "Transfer files to an S3 bucket",
+  "Provision an S3 Bucket": "Provision an S3 Bucket",
 };
 
 async function generateTerraform(context) {

@@ -94,7 +94,7 @@ function getWebviewContent(panel) {
     <div class="panel-background">
       <div class="button-container">
         <button class="option-button" onclick="generatePredefinedCode('Provision an EC2 instance')">Provision EC2 Instance</button>
-        <button class="option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">S3 Bucket Transfer</button>
+        <button class="option-button" onclick="generatePredefinedCode('Transfer files to an S3 bucket')">Provision S3 Bucket</button>
       </div>
       <textarea id="prompt" rows="2" placeholder="Describe the terraform template you want to generate"></textarea>
     </div>
